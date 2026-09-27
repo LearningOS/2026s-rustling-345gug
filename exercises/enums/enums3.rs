@@ -5,26 +5,31 @@
 // Execute `rustlings hint enums3` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
+
+use crate::Message::Move;
 
 enum Message {
     // TODO: implement the message variant types based on their usage below
+    Quit,
+    Move{x:u32,y:u32},
+    Echo(String),
+    ChangeColor(u32,u32,u32),
 }
 
 struct Point {
-    x: u8,
-    y: u8,
+    x: u32,
+    y: u32,
 }
 
 struct State {
-    color: (u8, u8, u8),
+    color: (u32, u32, u32),
     position: Point,
     quit: bool,
     message: String
 }
 
 impl State {
-    fn change_color(&mut self, color: (u8, u8, u8)) {
+    fn change_color(&mut self, color: (u32, u32, u32)) {
         self.color = color;
     }
 
@@ -43,6 +48,12 @@ impl State {
         // variants
         // Remember: When passing a tuple as a function argument, you'll need
         // extra parentheses: fn function((t, u, p, l, e))
+        match message {
+            Message::Quit => self.quit(),
+            Message::Move{x,y} => self.move_position(Point{x,y}),
+            Message::Echo(s) => self.echo(s),
+            Message::ChangeColor(r,g ,b ) => self.change_color((r,g,b)),
+        }
     }
 }
 
@@ -60,7 +71,7 @@ mod tests {
         };
         state.process(Message::ChangeColor(255, 0, 255));
         state.process(Message::Echo(String::from("hello world")));
-        state.process(Message::Move(Point { x: 10, y: 15 }));
+        state.process(Message::Move { x: 10, y: 15 });
         state.process(Message::Quit);
 
         assert_eq!(state.color, (255, 0, 255));

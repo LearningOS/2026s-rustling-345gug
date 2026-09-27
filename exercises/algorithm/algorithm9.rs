@@ -1,8 +1,7 @@
 /*
-	heap
-	This question requires you to implement a binary heap function
+    heap
+    This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,7 +36,25 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        // 1. 计数+1，放到数组末尾
+        self.count += 1;
+        if self.count >= self.items.len() {
+            self.items.push(value);
+        } else {
+            self.items[self.count] = value;
+        }
+        // 上浮 sift up：新元素向上比较，交换直到满足堆性质
+        let mut idx = self.count;
+        while idx > 1 {
+            let parent = self.parent_idx(idx);
+            // comparator(child, parent) → 如果子节点应该排在父上面，交换
+            if (self.comparator)(&self.items[idx], &self.items[parent]) {
+                self.items.swap(idx, parent);
+                idx = parent;
+            } else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +74,20 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let left = self.left_child_idx(idx); // 左孩子下标
+        let right = self.right_child_idx(idx); // 右孩子下标
+
+        // 没有右孩子，直接返回左
+        if right > self.count {
+            return left;
+        }
+
+        // 比较左右两个子节点【里面存储的值】，返回优先级更高的那个下标
+        if (self.comparator)(&self.items[left], &self.items[right]) {
+            left
+        } else {
+            right
+        }
     }
 }
 
@@ -82,13 +111,32 @@ where
     T: Default,
 {
     type Item = T;
-
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        // 如果堆空，返回 None
+        if self.is_empty() {
+            return None;
+        }
+
+        // 取出堆顶（items[1]）
+        let top = self.items.swap_remove(1);
+        self.count -= 1;
+
+        if self.count > 0 {
+            // 把原来最后一个元素放到根，开始下沉 sift down
+            let mut idx = 1;
+            while self.children_present(idx) {
+                let child_idx = self.smallest_child_idx(idx);
+                if (self.comparator)(&self.items[child_idx], &self.items[idx]) {
+                    self.items.swap(idx, child_idx);
+                    idx = child_idx;
+                } else {
+                    break;
+                }
+            }
+        }
+        Some(top)
     }
 }
-
 pub struct MinHeap;
 
 impl MinHeap {

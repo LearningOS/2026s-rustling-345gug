@@ -1,8 +1,7 @@
 /*
-	graph
-	This problem requires you to implement a basic graph functio
+    graph
+    This problem requires you to implement a basic graph functio
 */
-// I AM NOT DONE
 
 use std::collections::{HashMap, HashSet};
 use std::fmt;
@@ -29,7 +28,18 @@ impl Graph for UndirectedGraph {
         &self.adjacency_table
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
-        //TODO
+        let (from, to, weight) = edge;
+        // 1. 先保证两个顶点一定存在，不存在就自动创建顶点
+        self.add_node(from);
+        self.add_node(to);
+
+        // 2. from顶点，添加to作为邻居
+        let from_neighbors = self.adjacency_table_mutable().get_mut(from).unwrap();
+        from_neighbors.push((to.to_string(), weight));
+
+        // 3. to顶点，添加from作为邻居（无向图双向）
+        let to_neighbors = self.adjacency_table_mutable().get_mut(to).unwrap();
+        to_neighbors.push((from.to_string(), weight));
     }
 }
 pub trait Graph {
@@ -37,8 +47,13 @@ pub trait Graph {
     fn adjacency_table_mutable(&mut self) -> &mut HashMap<String, Vec<(String, i32)>>;
     fn adjacency_table(&self) -> &HashMap<String, Vec<(String, i32)>>;
     fn add_node(&mut self, node: &str) -> bool {
-        //TODO
-		true
+        let table = self.adjacency_table_mutable();
+        if table.contains_key(node) {
+            false
+        } else {
+            table.insert(node.to_string(), Vec::new());
+            true
+        }
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
         //TODO
